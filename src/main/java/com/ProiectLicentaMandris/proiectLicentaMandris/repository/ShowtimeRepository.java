@@ -16,6 +16,13 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
 
     List<Showtime> findByMovieMovieId(Long movieId);
 
+    List<Showtime> findByStartTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    List<Showtime> findByMovieMovieIdAndCinemaCinemaId(Long movieId, Long cinemaId);
+    List<Showtime> findByStartTimeBetweenAndCinemaCinemaId(LocalDateTime startDateTime, LocalDateTime endDateTime, Long cinemaId);
+    void deleteByMovie(Movie movie);
+
+
 
 }
 

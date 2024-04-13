@@ -1,5 +1,6 @@
 package com.ProiectLicentaMandris.proiectLicentaMandris.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -22,14 +24,23 @@ public class Movie {
     private String title;
     private String releaseDate;
     private String director;
-    private String genre;
+    @Enumerated(value = EnumType.STRING)
+    private Genre genre;
     private String backdrop;
     private String posterImageUrl;
     private String trailerLink;
+    @Enumerated(value = EnumType.STRING)
+    private Rating rated;
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
+    private Duration duration;
+    private String imdbMovieId;
 
     @OneToMany(mappedBy = "movie")
-    @JsonIgnoreProperties("movie") // Add this to prevent recursion
+    @JsonIgnore
+    //@JsonIgnoreProperties("movie") // Add this to prevent recursion
     private List<Review> reviews;
+
     @ManyToMany
     @JoinTable(
             name = "movie_actors",
@@ -37,5 +48,15 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "actorId")
     )
     private List<Actor> actors;
+
+    @ManyToMany
+    @JoinTable(
+            name = "cinema_movies",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "cinema_id")
+    )
+    private List<Cinema> cinemas;
+
+
 
 }

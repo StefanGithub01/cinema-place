@@ -1,5 +1,7 @@
 package com.ProiectLicentaMandris.proiectLicentaMandris.controller;
 
+import com.ProiectLicentaMandris.proiectLicentaMandris.dto.MovieAssemblerDto;
+import com.ProiectLicentaMandris.proiectLicentaMandris.dto.ReviewAssemblerDto;
 import com.ProiectLicentaMandris.proiectLicentaMandris.entity.Booking;
 import com.ProiectLicentaMandris.proiectLicentaMandris.entity.Movie;
 import com.ProiectLicentaMandris.proiectLicentaMandris.entity.Review;
@@ -22,19 +24,38 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+
+    @GetMapping("/reviews/{movieId}")
+    public ResponseEntity <List<Review>> getReviewsByMovieId(@PathVariable Long movieId) {
+        List<Review> reviews = reviewService.getReviewsByMovieId(movieId);
+        if(reviews.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }else {
+            return ResponseEntity.ok(reviews);
+        }
+    }
+    @GetMapping("/getReview/{reviewId}")
+    public ResponseEntity<Review> getReviewById(@PathVariable Long reviewId) {
+        Optional<Review> optionalReview = reviewService.getReviewById(reviewId);
+        if (optionalReview.isPresent()) {
+            return new ResponseEntity<>(optionalReview.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @GetMapping
     public ResponseEntity<List<Review>> allReviews() {
         return new ResponseEntity<List<Review>>(reviewService.allReviews(), HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping("/createReview")
     public ResponseEntity<Review> createReview(@RequestBody Map<String, Object> reviewData) {
         Long userId = Long.valueOf(reviewData.get("userId").toString());
         Long movieId = Long.valueOf(reviewData.get("movieId").toString());
+        String title = reviewData.get("title") != null ? reviewData.get("title").toString() : ""; // Handle null title
         int ratingScore = (int) reviewData.get("ratingScore");
-        String comment = (String) reviewData.get("comment");
-
-        return new ResponseEntity<>(reviewService.createReview(userId, movieId, ratingScore, comment), HttpStatus.CREATED);
+        String comment = reviewData.get("comment") != null ? reviewData.get("comment").toString() : ""; // Handle null comment
+        return new ResponseEntity<>(reviewService.createReview(userId, movieId, ratingScore, comment, title), HttpStatus.CREATED);
     }
 
     @GetMapping("/user/{id}")
@@ -47,19 +68,42 @@ public class ReviewController {
         }
     }
 
+    // Delete review by ID
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> removeReview(@PathVariable("id") Long reviewId) {
         try {
-            Optional<Review> review = reviewService.getReviewById(reviewId);
-            if (review == null) {
-                return ResponseEntity.notFound().build();
-            }
-            // Delete the booking from the database
             reviewService.deleteReview(reviewId);
-
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing review: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error removing review: " + e.getMessage());
         }
     }
+    @PutMapping("/{reviewId}/{userId}/agree")
+    public ResponseEntity<Void> agreeWithReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+        try {
+            reviewService.agreeWithReview(userId, reviewId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{reviewId}/{userId}/disagree")
+    public ResponseEntity<Void> disagreeWithReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+        try {
+            reviewService.disagreeWithReview(userId, reviewId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/admin/update")
+    public ResponseEntity<Review> updateReview(@RequestBody ReviewAssemblerDto ReviewFormData) {
+        Review updatedReview = reviewService.updateReview(ReviewFormData);
+        return new ResponseEntity<>(updatedReview, HttpStatus.CREATED);
+    }
+
 }
+

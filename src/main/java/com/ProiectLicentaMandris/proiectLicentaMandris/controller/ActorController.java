@@ -1,9 +1,11 @@
 package com.ProiectLicentaMandris.proiectLicentaMandris.controller;
 
 import com.ProiectLicentaMandris.proiectLicentaMandris.entity.Actor;
+import com.ProiectLicentaMandris.proiectLicentaMandris.entity.Movie;
 import com.ProiectLicentaMandris.proiectLicentaMandris.service.ActorService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,4 +36,16 @@ public class ActorController {
         List<Actor> actors = actorService.getAllActors();
         return ResponseEntity.ok(actors);
     }
+    @PostMapping("/admin/add")
+    public ResponseEntity<Actor> addActor(@RequestBody Actor actor) {
+        Actor addedActor = actorService.addActor(actor);
+        return new ResponseEntity<>(addedActor, HttpStatus.CREATED);
+    }
+    @PostMapping("/admin/update")
+    public ResponseEntity<Actor> updateActor(@RequestBody Actor actor) {
+        Actor addedActor = actorService.updateActor(actor);
+        return new ResponseEntity<>(addedActor, HttpStatus.OK);
+    }
+
+
 }

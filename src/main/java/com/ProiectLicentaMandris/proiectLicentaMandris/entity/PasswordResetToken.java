@@ -1,6 +1,6 @@
 package com.ProiectLicentaMandris.proiectLicentaMandris.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,21 +14,15 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Booking {
+public class PasswordResetToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookingId;
-    @ManyToOne
-    @JoinColumn(name = "userId")
+    private Long id;
+    private String token;
+    private LocalDateTime expiryDateTime;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "showtimeId")
-    private Showtime showtime;
-    @Column(columnDefinition = "TEXT") // Use appropriate column type for your database
-    private String bookedSeats;
-    private LocalDateTime date;
-    private double price;
+
 
 }
-
-

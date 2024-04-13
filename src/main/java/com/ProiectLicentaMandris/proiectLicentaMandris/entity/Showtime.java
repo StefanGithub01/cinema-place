@@ -33,4 +33,11 @@ public class Showtime {
     @Convert(converter = SeatGridConverter.class)
     private Boolean[][] seatGrid;
 
+    public Showtime(Movie movie, Cinema cinema, LocalDateTime startTime, LocalDateTime endTime, Boolean[][] seatGrid) {
+        this.movie = movie;
+        this.cinema = cinema;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.seatGrid = seatGrid;
+    }
 }
